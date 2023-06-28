@@ -1,5 +1,4 @@
 import { Router } from "express";
-import User from "../models/User.js";
 import validator from "../middlewares/validator.js";
 import passwordValidator from "../middlewares/passwordValidator.js";
 import createHash from "../middlewares/createHash.js";
@@ -7,6 +6,30 @@ import isPasswordValid from "../middlewares/isPasswordValid.js";
 import passport from "passport";
 
 const auth_router = Router();
+
+// GITHUB REGISTER
+auth_router.get(
+  "/github",
+  passport.authenticate("github", { scope: ["user:email"] }),
+  (req, res) => {}
+);
+
+auth_router.get(
+  "/github/callback",
+  passport.authenticate("github", {
+    failureRedirect: "/api/auth/fail-register-github",
+  }),
+  (req, res) => {
+    res.status(200).redirect("/");
+  }
+);
+
+auth_router.get("fail-register-github", (req, res) => {
+  res.status(403).json({
+    success: false,
+    response: "auth error",
+  });
+});
 
 // REGISTER
 auth_router.post(
